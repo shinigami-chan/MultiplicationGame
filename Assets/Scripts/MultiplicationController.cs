@@ -1,18 +1,24 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.UI;
+using Random = System.Random;
+using System;
 
-public class MultiplicationController : MonoBehaviour{
+public class MultiplicationController : MonoBehaviour
+{
+    Random rnd = new Random(Guid.NewGuid().GetHashCode());
 
     private View view;
     private Game game;
 
     // Use this for initialization
-    void Awake () {
+    void Awake()
+    {
 
         //initialize game and view (need to be added to an object -> using camera since it exists through the whole game)
         game = GameObject.Find("Main Camera").AddComponent<Game>();
         view = GameObject.Find("Main Camera").AddComponent<View>();
+        game.setNpc( GameObject.Find("Main Camera").AddComponent<Npc>());
 
         game.getPlayer().setPlayerName(PlayerPrefs.GetString("PlayerName"));
         view.setPlayerName(game.getPlayer().getPlayerName());
@@ -36,6 +42,7 @@ public class MultiplicationController : MonoBehaviour{
             Debug.Log("neue Quest wurde geladen.");
             view.setTaskText(game.currentQuest.getProblem().stringProblemTask());
             view.setButtonTexts(game.currentQuest.getOptions());
+            StartCoroutine(startNpcBehaviour());
         }
     }
 
@@ -64,27 +71,65 @@ public class MultiplicationController : MonoBehaviour{
         }
     }
 
-    //update points in class Player
-    public void updatePoints(int recievedPoints)
+    //update points in class Player or Npc
+    public void updatePoints(int recievedPoints, bool player)
     {
-        game.getPlayer().setPoints(recievedPoints);
-        view.refreshPoints(game.getPlayer().getPoints());
+        if (player)
+        {
+            game.getPlayer().setPoints(recievedPoints);
+            view.refreshPoints(game.getPlayer().getPoints());
+        }
+        game.getNpc().setPoints(recievedPoints);
+        view.refreshNpcPoints(game.getNpc().getPoints());
     }
+
+
+    public IEnumerator startNpcBehaviour()
+    {
+        yield return new WaitForSeconds(1);
+
+        Debug.Log("click");
+
+        int i = rnd.Next(0, 11);
+        while (view.buttonList[i].interactable == false)
+        {
+            i = rnd.Next(0, 11);
+        }
+        view.buttonList[i].interactable = false;
+
+        if (((MathOption)game.currentQuest.getOptions()[i]).getIsCorrect())
+            {
+                view.setDisabledButtonColor(view.buttonList[i], Color.green);
+                updatePoints(10,false);
+                disableButtons();
+                Invoke("resetButtons", 1.25f);
+                Invoke("loadNewRound", 1.25f);
+            }
+            else
+            {
+                view.setDisabledButtonColor(view.buttonList[i], Color.red);
+                StartCoroutine(startNpcBehaviour());
+            }
+    }
+
 
     //triggers events following a clicked button (points, new task etc.)
     public void evaluateAnswer(Button button)
-        //TODO: behaviour when all Buttons have already been clicked
+    //TODO: behaviour when all Buttons have already been clicked
     {
         button.interactable = false;
-        if (int.Parse(button.GetComponentInChildren<Text>().text) == game.currentQuest.getProblem().getSolution())
+        int buttonIndex = view.buttonList.IndexOf(button);
+        MathOption clickedOption = (MathOption)game.currentQuest.getOptions()[buttonIndex];
+        //clickedOption.setIsClicked();
+
+        if (clickedOption.getIsCorrect())
         {
-            Debug.Log(game.currentQuest.getProblem().stringProblemTask()+" = "+ game.currentQuest.getProblem().getSolution()+" correct answer given");
+            Debug.Log(game.currentQuest.getProblem().stringProblemTask() + " = " + game.currentQuest.getProblem().getSolution() + " correct answer given");
 
-            ColorBlock cb = button.colors;      //copy
-            cb.disabledColor = Color.green;     //add change to the copy
-            button.colors = cb;                 //apply copy back
+            view.setDisabledButtonColor(button, Color.green);
 
-            updatePoints(10);
+            updatePoints(10,true);
+            disableButtons();
             //Invoke: adds delay time for the methods
             Invoke("resetButtons", 1.25f);
             Invoke("loadNewRound", 1.25f);
@@ -93,9 +138,7 @@ public class MultiplicationController : MonoBehaviour{
         {
             Debug.Log(game.currentQuest.getProblem().stringProblemTask() + " = " + game.currentQuest.getProblem().getSolution() + " wrong answer given");
 
-            ColorBlock cb = button.colors;
-            cb.disabledColor = Color.red;
-            button.colors = cb;
+            view.setDisabledButtonColor(button, Color.red);
         }
     }
 }

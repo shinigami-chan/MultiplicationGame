@@ -3,14 +3,14 @@ using System.Collections;
 using UnityEngine;
 using Random = System.Random;
 
-public class MultiplicationQuest {
+public class MultiplicationQuest
+{
 
     Random rnd = new Random(Guid.NewGuid().GetHashCode());
 
     private MathProblem problem; //mathematical problem, contains term and correct solution
     private ArrayList options; //contains solution, its validity and if the option is already clicked
     readonly int amountOfOptions = 12;
-    private int optionsClicked = 0;
 
     public MultiplicationQuest()
     {

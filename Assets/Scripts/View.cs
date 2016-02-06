@@ -62,9 +62,21 @@ public class View : MonoBehaviour
         playerNameText.text = playerName;
     }
 
+    public void setDisabledButtonColor(Button button, Color color)
+    {
+        ColorBlock cb = button.colors;  //copy
+        cb.disabledColor = color;       //add change to the copy
+        button.colors = cb;             //apply copy back
+    }
+
     public void refreshPoints(int displayedPoints)
     {
         playerScoreText.text = "" + displayedPoints;
+    }
+
+    public void refreshNpcPoints(int displayedPoints)
+    {
+        npcScoreText.text = "" + displayedPoints;
     }
 
     public void setButtonTexts(ArrayList options)

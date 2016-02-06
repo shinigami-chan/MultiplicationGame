@@ -1,15 +1,22 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Npc : MonoBehaviour {
+public class Npc : MonoBehaviour
+{
 
-	// Use this for initialization
-	void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
+    readonly string npcName = "Gegner";
+    private bool hasClicked = false;
+    private int playerID;
+    private int points;
+
+    public int getPoints()
+    {
+        return points;
+    }
+
+    public void setPoints(int receivedPoints)
+    {
+        points += receivedPoints;
+    }
+
 }

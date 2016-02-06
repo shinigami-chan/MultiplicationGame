@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Player {
+public class Player
+{
 
-    public int playerId;
+    private int playerId;
     private string playerName = "Spieler";
     private int points = 0;
 
@@ -11,9 +12,10 @@ public class Player {
     public Player(string name)
     {
         playerName = name;
-    }	
+    }
 
-    public string getPlayerName (){
+    public string getPlayerName()
+    {
         return playerName;
     }
 

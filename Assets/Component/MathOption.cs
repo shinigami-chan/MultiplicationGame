@@ -1,4 +1,5 @@
-﻿public class MathOption : Option {
+﻿public class MathOption : Option
+{
 
     private float altSolution;          //alternative solution, can be correct or incorrect
     private bool isCorrect = false;
@@ -28,5 +29,10 @@
     public float getAltSolution()
     {
         return altSolution;
+    }
+
+    public bool getIsCorrect()
+    {
+        return isCorrect;
     }
 }

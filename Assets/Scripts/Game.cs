@@ -1,15 +1,17 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class Game : MonoBehaviour {
+public class Game : MonoBehaviour
+{
 
     private Player player;
-    readonly int maxRounds = 1;
+    private Npc npc;
+    readonly int maxRounds = 5;
     public int currentRound = 0;
     public MultiplicationQuest currentQuest;
 
     public Game()
-    {
+    {           
         player = new Player();
     }
 
@@ -41,5 +43,15 @@ public class Game : MonoBehaviour {
     public Player getPlayer()
     {
         return player;
+    }
+
+    public Npc getNpc()
+    {
+        return npc;
+    }
+
+    public void setNpc(Npc npc)
+    {
+        this.npc = npc;
     }
 }
