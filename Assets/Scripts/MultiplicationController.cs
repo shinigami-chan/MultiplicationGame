@@ -31,7 +31,6 @@ public class MultiplicationController : MonoBehaviour
         //all rounds have been played -> switch to the end screen memorizing player score
         if (game.loadCurrentQuest() == null)
         {
-            //disableButtons();
             Debug.Log("Alle Runden wurden gespielt.");
             PlayerPrefs.SetInt("PlayerPoints", game.getPlayer().getPoints());
             Application.LoadLevel("end_screen");
@@ -121,15 +120,16 @@ public class MultiplicationController : MonoBehaviour
         int buttonIndex = view.buttonList.IndexOf(button);
         MathOption clickedOption = (MathOption)game.currentQuest.getOptions()[buttonIndex];
         //clickedOption.setIsClicked();
-
+       
         if (clickedOption.getIsCorrect())
         {
+            StopAllCoroutines();
             Debug.Log(game.currentQuest.getProblem().stringProblemTask() + " = " + game.currentQuest.getProblem().getSolution() + " correct answer given");
-
             view.setDisabledButtonColor(button, Color.green);
 
             updatePoints(10,true);
             disableButtons();
+
             //Invoke: adds delay time for the methods
             Invoke("resetButtons", 1.25f);
             Invoke("loadNewRound", 1.25f);
