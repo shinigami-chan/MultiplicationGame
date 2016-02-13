@@ -15,7 +15,7 @@ public class MultiplicationController : MonoBehaviour
     void Awake()
     {
 
-        //initialize game and view (need to be added to an object -> using camera since it exists through the whole game)
+        //initialize game (+ npc) and view (need to be added to an object -> using camera since it exists through the whole game)
         game = GameObject.Find("Main Camera").AddComponent<Game>();
         view = GameObject.Find("Main Camera").AddComponent<View>();
         game.setNpc( GameObject.Find("Main Camera").AddComponent<Npc>());
@@ -28,14 +28,15 @@ public class MultiplicationController : MonoBehaviour
 
     public void loadNewRound()
     {
+        view.resetAllButtons();
         //all rounds have been played -> switch to the end screen memorizing player score
         if (game.loadCurrentQuest() == null)
         {
             Debug.Log("Alle Runden wurden gespielt.");
-            PlayerPrefs.SetInt("PlayerPoints", game.getPlayer().getPoints());
+            PlayerPrefs.SetInt("PlayerPoints", game.getPlayer().getPoints()); //necessary for transfering this to the next scene
             Application.LoadLevel("end_screen");
         }
-        //new quest has been loaded -> set the task to its panel and the options to the buttons
+        //new quest has been loaded -> set the task to its panel and the options to the buttons, start npc behaviour
         else
         {
             Debug.Log("neue Quest wurde geladen.");
@@ -45,32 +46,8 @@ public class MultiplicationController : MonoBehaviour
         }
     }
 
-    //set all buttons disabled
-    public void disableButtons()
-    {
-        for (int i = 0; i < view.buttonList.Count; i++)
-        {
-            view.buttonList[i].interactable = false;
-        }
-    }
 
-    //sets all buttons interactable and its disabled color back to grey
-    public void resetButtons()
-    {
-        ColorBlock cb;
-        cb = view.buttonList[1].colors;
-
-        for (int i = 0; i < view.buttonList.Count; i++)
-        {
-            view.buttonList[i].interactable = true;
-
-            cb.disabledColor = Color.grey;
-            view.buttonList[i].colors = cb;
-
-        }
-    }
-
-    //update points in class Player or Npc
+    //update points in class Player or Npc and in view
     public void updatePoints(int recievedPoints, bool player)
     {
         if (player)
@@ -78,16 +55,21 @@ public class MultiplicationController : MonoBehaviour
             game.getPlayer().setPoints(recievedPoints);
             view.refreshPoints(game.getPlayer().getPoints());
         }
-        game.getNpc().setPoints(recievedPoints);
-        view.refreshNpcPoints(game.getNpc().getPoints());
+        else
+        {
+            game.getNpc().setPoints(recievedPoints);
+            view.refreshNpcPoints(game.getNpc().getPoints());
+        }
     }
 
 
     public IEnumerator startNpcBehaviour()
     {
+       
+
         yield return new WaitForSeconds(1);
 
-        Debug.Log("click");
+        Debug.Log("click"+" "+game.getNpc().responseTime());
 
         int i = rnd.Next(0, 11);
         while (view.buttonList[i].interactable == false)
@@ -100,8 +82,7 @@ public class MultiplicationController : MonoBehaviour
             {
                 view.setDisabledButtonColor(view.buttonList[i], Color.green);
                 updatePoints(10,false);
-                disableButtons();
-                Invoke("resetButtons", 1.25f);
+                view.disableAllButtons();
                 Invoke("loadNewRound", 1.25f);
             }
             else
@@ -114,24 +95,22 @@ public class MultiplicationController : MonoBehaviour
 
     //triggers events following a clicked button (points, new task etc.)
     public void evaluateAnswer(Button button)
-    //TODO: behaviour when all Buttons have already been clicked
     {
         button.interactable = false;
         int buttonIndex = view.buttonList.IndexOf(button);
         MathOption clickedOption = (MathOption)game.currentQuest.getOptions()[buttonIndex];
-        //clickedOption.setIsClicked();
+        clickedOption.setIsClicked();
        
         if (clickedOption.getIsCorrect())
         {
-            StopAllCoroutines();
+            StopAllCoroutines(); //prevents any interaction with the npc
             Debug.Log(game.currentQuest.getProblem().stringProblemTask() + " = " + game.currentQuest.getProblem().getSolution() + " correct answer given");
             view.setDisabledButtonColor(button, Color.green);
 
             updatePoints(10,true);
-            disableButtons();
+            view.disableAllButtons();
 
             //Invoke: adds delay time for the methods
-            Invoke("resetButtons", 1.25f);
             Invoke("loadNewRound", 1.25f);
         }
         else

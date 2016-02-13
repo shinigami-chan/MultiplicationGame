@@ -69,14 +69,15 @@ public class View : MonoBehaviour
         button.colors = cb;             //apply copy back
     }
 
-    public void refreshPoints(int displayedPoints)
+    
+    public void refreshPoints(int newPoints)
     {
-        playerScoreText.text = "" + displayedPoints;
+        playerScoreText.text = "" + newPoints;
     }
 
-    public void refreshNpcPoints(int displayedPoints)
+    public void refreshNpcPoints(int newPoints)
     {
-        npcScoreText.text = "" + displayedPoints;
+        npcScoreText.text = "" + newPoints;
     }
 
     public void setButtonTexts(ArrayList options)
@@ -92,6 +93,31 @@ public class View : MonoBehaviour
     public void setTaskText(string task)
     {
         taskText.text = task;
+    }
+
+    //sets all buttons interactable and its disabled color back to grey
+    public void resetAllButtons()
+    {
+        ColorBlock cb;
+        cb = buttonList[1].colors;
+
+        for (int i = 0; i < buttonList.Count; i++)
+        {
+            buttonList[i].interactable = true;
+
+            cb.disabledColor = Color.grey;
+            buttonList[i].colors = cb;
+
+        }
+    }
+
+    //set all buttons disabled
+    public void disableAllButtons()
+    {
+        for (int i = 0; i < buttonList.Count; i++)
+        {
+            buttonList[i].interactable = false;
+        }
     }
 
 
