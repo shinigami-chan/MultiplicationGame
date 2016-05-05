@@ -65,14 +65,15 @@ public class MultiplicationController : MonoBehaviour
 
     public IEnumerator startNpcBehaviour()
     {
-       
+        //lognormal distributed response time
+        yield return new WaitForSeconds(game.getNpc().responseTime()/1000);
 
-        yield return new WaitForSeconds(1);
-
+        bool npcAnswersCorrect = game.getNpc().isNpcAnswerCorrect();
         Debug.Log("click"+" "+game.getNpc().responseTime());
 
         int i = rnd.Next(0, 11);
-        while (view.buttonList[i].interactable == false)
+        while (view.buttonList[i].interactable == false ||
+            ((MathOption)game.currentQuest.getOptions()[i]).getIsCorrect() != npcAnswersCorrect)
         {
             i = rnd.Next(0, 11);
         }
